@@ -1,4 +1,4 @@
-import Message, { IDraftMessage } from "./message";
+import Message, { IDraftMessage, IMessageContent } from "./message";
 export default class Messaging {
     name: string;
     waitingQueue: {
@@ -12,6 +12,6 @@ export default class Messaging {
     onReceive(msg: Message): boolean;
     ping(target: string): void;
     reply(original: Message, draft: IDraftMessage): void;
-    send(draft: IDraftMessage): Promise<Message> | null;
-    waitReplyFor(msgId: string, timeoutSecs: number): Promise<Message>;
+    send(draft: IDraftMessage): Promise<[IMessageContent | null, Error | null]> | null;
+    waitReplyFor(msgId: string, timeoutSecs: number): Promise<[IMessageContent | null, Error | null]>;
 }

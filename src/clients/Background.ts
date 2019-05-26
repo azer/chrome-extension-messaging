@@ -1,29 +1,51 @@
 import Messaging from "../messaging"
-import Message from "../message"
+import Message, { IMessageContent } from "../message"
 
 export type ICommands = {
-  [name: string]: (msg: Message, client: BackgroundClient) => void
+  [name: string]: (
+    msg: Message,
+    callback: (error: Error | undefined, result?: IMessageContent) => void
+  ) => void
 }
 
 export default class BackgroundClient extends Messaging {
   commands: ICommands
-  constructor(name: string) {
+  constructor(name: string, commands: ICommands) {
     super()
     this.name = `${name}:background`
-    this.commands = {}
+    this.commands = commands
   }
 
-  defineCommands(commands: ICommands) {
-    this.commands = {}
+  listenForMessages() {
+    chrome.runtime.onMessage.addListener(msg => this.onReceive(msg))
+  }
 
-    for (let name in commands) {
-      this.commands[name] = commands[name]
-    }
+  sendMessage(msg: Message) {
+    chrome.runtime.sendMessage(msg)
   }
 
   handleIncomingMessage(msg: Message): boolean {
-    if (this.commands[msg.content["command"]]) {
-      this.commands[msg.content["command"]](msg, this)
+    const cmd = msg.content["command"] as string
+
+    if (this.commands[cmd]) {
+      this.commands[cmd](
+        msg,
+        (error: Error | undefined, result?: IMessageContent) => {
+          if (error) {
+            return this.reply(msg, {
+              to: msg.origin,
+              content: {},
+              error: error.message
+            })
+          }
+
+          return this.reply(msg, {
+            to: msg.origin,
+            content: result as IMessageContent
+          })
+        }
+      )
+
       return true
     }
 

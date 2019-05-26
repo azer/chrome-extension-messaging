@@ -4,7 +4,7 @@ import Message from "../message"
 export default class PopupMessagingClient extends Messaging {
   constructor(name: string) {
     super()
-    this.name = `${name}:newtab`
+    this.name = `${name}:popup`
   }
 
   listenForMessages() {

@@ -1,7 +1,7 @@
 {
   "name": "chrome-extension-messaging",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "devDependencies": {
     "@types/chrome": "0.0.86",
     "typescript": "^3.4.5"

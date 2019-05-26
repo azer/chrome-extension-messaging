@@ -1,4 +1,9 @@
-import Message, { IDraftMessage, IMessage, generateMessageId } from "./message"
+import Message, {
+  IDraftMessage,
+  IMessage,
+  IMessageContent,
+  generateMessageId
+} from "./message"
 import constants from "./constants"
 
 export default class Messaging {
@@ -29,7 +34,8 @@ export default class Messaging {
       to: draft.to,
       error: draft.error,
       content: draft.content,
-      replyTo: draft.replyTo
+      replyTo: draft.replyTo,
+      requiresReply: draft.requiresReply
     })
   }
 
@@ -64,7 +70,9 @@ export default class Messaging {
     this.send(draft)
   }
 
-  send(draft: IDraftMessage): Promise<Message> | null {
+  send(
+    draft: IDraftMessage
+  ): Promise<[IMessageContent | null, Error | null]> | null {
     const msg = this.createMessage(draft)
     this.sendMessage(msg)
 
@@ -73,7 +81,10 @@ export default class Messaging {
     return this.waitReplyFor(msg.id, constants.TIMEOUT_SECS)
   }
 
-  waitReplyFor(msgId: string, timeoutSecs: number): Promise<Message> {
+  waitReplyFor(
+    msgId: string,
+    timeoutSecs: number
+  ): Promise<[IMessageContent | null, Error | null]> {
     const self = this
     let done: boolean = false
 
@@ -87,7 +98,13 @@ export default class Messaging {
 
         done = true
         cleanup()
-        resolve(msg)
+
+        if (msg.error) {
+          resolve([null, new Error(msg.error)])
+          return
+        }
+
+        resolve([msg.content, null])
       }
 
       function cleanup() {
@@ -97,15 +114,10 @@ export default class Messaging {
 
       function onTimeout() {
         cleanup()
-        resolve(
-          new Message({
-            id: generateMessageId(),
-            origin: "",
-            to: self.name,
-            content: {},
-            error: "Message response timeout (" + timeoutSecs + ")s."
-          })
-        )
+        resolve([
+          null,
+          new Error("Message response timeout (" + timeoutSecs + ")s.")
+        ])
       }
     })
   }
