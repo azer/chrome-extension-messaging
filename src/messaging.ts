@@ -35,7 +35,8 @@ export default class Messaging {
       error: draft.error,
       content: draft.content,
       replyTo: draft.replyTo,
-      requiresReply: draft.requiresReply
+      requiresReply: draft.requiresReply,
+      currentTab: draft.currentTab
     })
   }
 

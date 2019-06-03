@@ -5,6 +5,7 @@ export interface IDraftMessage {
     to: string;
     content: IMessageContent;
     requiresReply?: boolean;
+    currentTab?: boolean;
     replyTo?: string;
     error?: string;
 }
@@ -21,6 +22,7 @@ export default class Message implements IMessage {
     replyTo?: string;
     error?: string;
     proxyOrigin?: string;
+    currentTab?: boolean;
     constructor(options: IMessage);
 }
 export declare function generateMessageId(): string;
