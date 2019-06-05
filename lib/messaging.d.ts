@@ -12,6 +12,6 @@ export default class Messaging {
     onReceive(msg: Message): boolean;
     ping(target: string): void;
     reply(original: Message, draft: IDraftMessage): void;
-    send(draft: IDraftMessage): Promise<[IMessageContent | null, Error | null]> | null;
+    send(draft: IDraftMessage, timeoutSecs?: number): Promise<[IMessageContent | null, Error | null]> | null;
     waitReplyFor(msgId: string, timeoutSecs: number): Promise<[IMessageContent | null, Error | null]>;
 }

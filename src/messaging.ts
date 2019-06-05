@@ -72,14 +72,15 @@ export default class Messaging {
   }
 
   send(
-    draft: IDraftMessage
+    draft: IDraftMessage,
+    timeoutSecs?: number
   ): Promise<[IMessageContent | null, Error | null]> | null {
     const msg = this.createMessage(draft)
     this.sendMessage(msg)
 
     if (!msg.requiresReply) return null
 
-    return this.waitReplyFor(msg.id, constants.TIMEOUT_SECS)
+    return this.waitReplyFor(msg.id, timeoutSecs || constants.TIMEOUT_SECS)
   }
 
   waitReplyFor(
