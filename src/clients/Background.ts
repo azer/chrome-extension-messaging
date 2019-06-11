@@ -15,7 +15,20 @@ export default class BackgroundClient extends Messaging {
   }
 
   sendMessage(msg: Message) {
-    chrome.runtime.sendMessage(msg)
+    if (!msg.currentTab) {
+      chrome.runtime.sendMessage(msg)
+      return
+    }
+
+    chrome.tabs.query({ currentWindow: true, active: true }, function(
+      tabs: chrome.tabs.Tab[]
+    ) {
+      if (tabs.length === 0) {
+        return
+      }
+
+      chrome.tabs.sendMessage(tabs[0].id as number, msg)
+    })
   }
 
   handleIncomingMessage(msg: Message): boolean {

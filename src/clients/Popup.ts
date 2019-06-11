@@ -24,8 +24,6 @@ export default class PopupMessagingClient extends Messaging {
         return
       }
 
-      console.log("active tabs", tabs)
-
       chrome.tabs.sendMessage(tabs[0].id as number, msg)
     })
   }
